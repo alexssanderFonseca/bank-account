@@ -17,13 +17,13 @@ public class DynamoDBClient {
     @Value("${aws-region}")
     private String regiao;
 
-    @Value("${aws-endpoint}")
+    @Value("${aws-endpoint-dynamodb}")
     private String endpoint;
 
     @Value("${aws-access-key}")
     private String accessKey;
 
-    @Value("${aws-access-secret}")
+    @Value("${aws-secret-key}")
     private String accessSecret;
 
 

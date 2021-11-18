@@ -9,6 +9,7 @@ import br.com.alexsdm.conta.compartilhado.database.mapper.TitularItemMapper;
 import br.com.alexsdm.conta.domain.Conta;
 import br.com.alexsdm.conta.domain.Endereco;
 import br.com.alexsdm.conta.domain.Titular;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
@@ -40,7 +41,7 @@ public class AberturaContaDAO {
         this.client = client;
     }
 
-    public void abrir(Conta conta, Titular titular, Endereco endereco) {
+    public Map<String, Object> abrir(Conta conta, Titular titular, Endereco endereco) {
         var contaItem = contaItemMapper.deConta(conta);
         contaItem.gerarId();
         var titularItem = titularItemMapper.deTitular(titular);
@@ -55,6 +56,7 @@ public class AberturaContaDAO {
                 .addPutItem(titularTabela, titularItem)
                 .addPutItem(enderecoTabela, enderecoItem));
 
+        return Map.of("conta", contaItem, "titular", titularItem, "endereco", enderecoItem);
     }
 
 
