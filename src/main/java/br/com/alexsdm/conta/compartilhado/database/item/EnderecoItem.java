@@ -13,7 +13,7 @@ import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSortK
 @Setter
 public class EnderecoItem {
 
-    private String contaId;
+    private String titularId;
     private String enderecoId;
     private String principal;
     private String logradouro;
@@ -27,8 +27,8 @@ public class EnderecoItem {
 
     @DynamoDbPartitionKey
     @DynamoDbAttribute("pk")
-    public String getContaId() {
-        return contaId;
+    public String getTitularId() {
+        return titularId;
     }
 
     @DynamoDbSortKey

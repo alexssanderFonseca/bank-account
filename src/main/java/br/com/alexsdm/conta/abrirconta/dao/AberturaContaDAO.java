@@ -49,7 +49,7 @@ public class AberturaContaDAO {
         titularItem.setContaId(contaItem.getId());
         var enderecoItem = enderecoItemMapper.deEndereco(endereco);
         enderecoItem.gerarId();
-        enderecoItem.setContaId(contaItem.getId());
+        enderecoItem.setTitularId(titular.getId());
 
 
         client.transactWriteItems(r -> r.addPutItem(contaTabela, contaItem)
