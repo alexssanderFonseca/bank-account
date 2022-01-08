@@ -1,6 +1,5 @@
 package br.com.alexsdm.conta.compartilhado.config;
 
-import java.net.URI;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,6 +17,6 @@ public class SnsClientConfig {
     @Bean
     public SnsClient snsClient() {
         return SnsClient.builder()
-                .endpointOverride(URI.create(endpoint)).build();
+                .build();
     }
 }

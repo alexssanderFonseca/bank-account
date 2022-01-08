@@ -1,59 +1,120 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Description: "CloudFormation template for creating a task definition"
 
+Parameters:
+  SnsArn:
+    Type: String
+
 Resources:
-  MyTaskDefinition:
+  TaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:
       RequiresCompatibilities:
         - "FARGATE"
-      ExecutionRoleArn: "arn:aws:iam::591102276696:role/ecsTaskExecutionRole"
+      ExecutionRoleArn: "arn:aws:iam::596275259266:role/ecsTaskExecutionRole"
+      TaskRoleArn : "arn:aws:iam::596275259266:role/ecsTaskExecutionRole"
       Cpu: 256
       Memory: 512
       NetworkMode: "awsvpc"
       ContainerDefinitions:
         - Name: "bank_account"
-          Image: "591102276696.dkr.ecr.us-east-2.amazonaws.com/bank/account:latest"
+          Image: "596275259266.dkr.ecr.us-east-2.amazonaws.com/bank-account"
           MemoryReservation: 256
           Memory: 512
+          LogConfiguration:
+            LogDriver: "awslogs"
+            Options:
+              awslogs-group: !Ref 'CloudwatchLogsGroup'
+              awslogs-region: !Ref 'AWS::Region'
+              awslogs-stream-prefix: bank-account-app
           PortMappings:
             - ContainerPort: 8080
               Protocol: tcp
+          Environment:
+            - Name: AWS_SNS
+              Value: !Ref SnsArn
+            - Name: AWS_REGION
+              Value: !Ref "AWS::Region"
+
+
+
+  TaskExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: [ ecs-tasks.amazonaws.com ]
+            Action: [ "sts:AssumeRole" ]
+
+      Path: /
+      Policies:
+        - PolicyName: bankAccount-dynamodb
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Resource: "*"
+                Action:
+                  - "dynamodb:GetItem"
+                  - "dynamodb:BatchGetItem"
+                  - "dynamodb:Query"
+                  - "dynamodb:PutItem"
+                  - "dynamodb:UpdateItem"
+                  - "dynamodb:DeleteItem"
+                  - "dynamodb:Scan"
+                  - "dynamodb:BatchWriteItem"
+        - PolicyName: bankAccount-sns
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Resource: "*"
+                Action:
+                  - "sqs:SendMessage"
+
+  CloudwatchLogsGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Join [ '-', [ ECSLogGroup, !Ref 'AWS::StackName' ] ]
+      RetentionInDays: 14
+
 
   ECSCluster:
     Type: 'AWS::ECS::Cluster'
     Properties:
       ClusterName: MyFargateCluster
 
-  FargateAlb:
+  LoadBalancer:
     Type: 'AWS::ElasticLoadBalancingV2::LoadBalancer'
     Properties:
       Name: FargateAlb
       Subnets:
-        - subnet-22ac1f49
-        - subnet-fbf2a3b7
-        - subnet-1a28c167
+        - subnet-054605d359d18e847
+        - subnet-0b2ef034f384c2004
       Type: application
       SecurityGroups:
         - !GetAtt FargateAlbSG.GroupId
 
-  MyFargateTargetGroup:
+  TargetGroup:
     Type: 'AWS::ElasticLoadBalancingV2::TargetGroup'
     Properties:
       Name: MyFargateTargetGroup
-      VpcId: vpc-56eb603d
+      VpcId: vpc-0b280a2a58cd98ffd
       Protocol: HTTP
       Port: 8080
-      HealthCheckPath: /actuator/
+      HealthCheckIntervalSeconds: 60
+      HealthCheckPath: /actuator/health
       TargetType: ip
 
   Listener:
     Type: 'AWS::ElasticLoadBalancingV2::Listener'
     Properties:
       DefaultActions:
-        - TargetGroupArn: !Ref MyFargateTargetGroup
+        - TargetGroupArn: !Ref TargetGroup
           Type: forward
-      LoadBalancerArn: !Ref FargateAlb
+      LoadBalancerArn: !Ref LoadBalancer
       Port: 80
       Protocol: HTTP
 
@@ -62,6 +123,7 @@ Resources:
     Properties:
       GroupDescription: SG for the Fargate ALB
       GroupName: FargateAlbSG
+      VpcId: vpc-0b280a2a58cd98ffd
       SecurityGroupIngress:
         - CidrIpv6: ::/0
           FromPort: 80
@@ -79,12 +141,13 @@ Resources:
     Properties:
       GroupDescription: SG for traffic between ALB and containers
       GroupName: Alb2FargateContainers
+      VpcId: vpc-0b280a2a58cd98ffd
       SecurityGroupIngress:
         - IpProtocol: -1
           SourceSecurityGroupId: !GetAtt FargateAlbSG.GroupId
           Description: 'Inbound rule for all traffic'
 
-  MyECSService:
+  ECSService:
     Type: AWS::ECS::Service
     DependsOn:
       - Listener
@@ -94,7 +157,7 @@ Resources:
         Ref: "ECSCluster"
       DesiredCount: 1
       TaskDefinition:
-        Ref: "MyTaskDefinition"
+        Ref: "TaskDefinition"
       DeploymentConfiguration:
         MaximumPercent: 100
         MinimumHealthyPercent: 0
@@ -103,12 +166,13 @@ Resources:
           AssignPublicIp: ENABLED
           SecurityGroups:
             - !GetAtt Alb2FargateContainers.GroupId
-          Subnets: [ 'subnet-22ac1f49','subnet-fbf2a3b7','subnet-1a28c167' ]
+          Subnets: [ 'subnet-054605d359d18e847', 'subnet-0b2ef034f384c2004' ]
       LoadBalancers:
         - TargetGroupArn:
-            Ref: MyFargateTargetGroup
+            Ref: TargetGroup
           ContainerPort: 8080
           ContainerName: bank_account
+
 
 
 
