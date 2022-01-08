@@ -49,14 +49,13 @@ public class AberturaContaDAO {
         titularItem.setContaId(contaItem.getId());
         var enderecoItem = enderecoItemMapper.deEndereco(endereco);
         enderecoItem.gerarId();
-        enderecoItem.setTitularId(titular.getId());
-
+        enderecoItem.setTitularId(titularItem.getId());
 
         client.transactWriteItems(r -> r.addPutItem(contaTabela, contaItem)
                 .addPutItem(titularTabela, titularItem)
                 .addPutItem(enderecoTabela, enderecoItem));
 
-        return Map.of("conta", contaItem, "titular", titularItem, "endereco", enderecoItem);
+        return Map.of(TABLE_NAME, contaItem, "titular", titularItem, "endereco", enderecoItem);
     }
 
 
