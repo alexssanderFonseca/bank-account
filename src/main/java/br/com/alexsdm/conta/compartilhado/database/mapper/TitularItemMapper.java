@@ -1,7 +1,7 @@
 package br.com.alexsdm.conta.compartilhado.database.mapper;
 
 import br.com.alexsdm.conta.compartilhado.database.item.TitularItem;
-import br.com.alexsdm.conta.domain.Titular;
+import br.com.alexsdm.conta.dominio.Titular;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;

@@ -1,4 +1,4 @@
-package br.com.alexsdm.conta.abrirconta.dto;
+package br.com.alexsdm.conta.funcionalidades.abrirconta.dto;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -10,4 +10,5 @@ public class AberturaContaEnderecoDTO {
     private String bairro;
     private String cep;
     private String pais;
+    private String cidade;
 }

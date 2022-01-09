@@ -1,7 +1,7 @@
-package br.com.alexsdm.conta.detalhesconta.controller;
+package br.com.alexsdm.conta.funcionalidades.detalhe.controller;
 
 
-import br.com.alexsdm.conta.detalhesconta.service.RecuperaTitularService;
+import br.com.alexsdm.conta.funcionalidades.detalhe.service.RecuperaDetalheConta;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,10 +14,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class DetalheContaController {
 
-    private final RecuperaTitularService recuperaTitularService;
+    private final RecuperaDetalheConta recuperaDetalheConta;
 
-    @GetMapping("/{id}/titulares")
+    @GetMapping("/{id}")
     public ResponseEntity<?> getTitular(@PathVariable String id) {
-        return ResponseEntity.ok(recuperaTitularService.executar(id));
+        return ResponseEntity.ok(recuperaDetalheConta.executar(id));
     }
 }

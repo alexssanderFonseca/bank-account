@@ -1,7 +1,7 @@
 package br.com.alexsdm.conta.compartilhado.database.mapper;
 
 import br.com.alexsdm.conta.compartilhado.database.item.EnderecoItem;
-import br.com.alexsdm.conta.domain.Endereco;
+import br.com.alexsdm.conta.dominio.Endereco;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")

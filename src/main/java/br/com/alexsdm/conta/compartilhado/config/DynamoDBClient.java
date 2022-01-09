@@ -1,6 +1,7 @@
 package br.com.alexsdm.conta.compartilhado.config;
 
 
+import java.net.URI;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +15,8 @@ public class DynamoDBClient {
 
     @Value("${aws-region}")
     private String regiao;
+    @Value("${aws-endpoint-dynamodb}")
+    private String endpoint;
 
     @Bean
     public DynamoDbEnhancedClient dynamoDbEnhancedClient() {
@@ -28,6 +31,7 @@ public class DynamoDBClient {
         return DynamoDbClient.builder()
                 .credentialsProvider(DefaultCredentialsProvider.builder().build())
                 .region(Region.of(regiao))
+                .endpointOverride(URI.create(endpoint))
                 .build();
 
 

@@ -1,5 +1,7 @@
 package br.com.alexsdm.conta.compartilhado.database.item;
 
+import br.com.alexsdm.conta.dominio.Conta;
+import br.com.alexsdm.conta.dominio.Titular;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,11 +23,7 @@ public class ContaItem {
 
     private String sk;
 
-    private String agencia;
-
     private String numero;
-
-    private String codigoBanco;
 
     private String senha;
 
@@ -44,8 +42,16 @@ public class ContaItem {
     @DynamoDbSortKey
     @DynamoDbAttribute("sk")
     public String getSk() {
-        return this.id;
+        this.sk = id;
+        return sk;
     }
 
+    public Conta paraConta(Titular titular, String idConta) {
+        return Conta.builder()
+                .id(idConta.replace("CONTA#", ""))
+                .numero(this.numero)
+                .titular(titular)
+                .build();
+    }
 
 }

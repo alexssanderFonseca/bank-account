@@ -1,4 +1,4 @@
-package br.com.alexsdm.conta.abrirconta.service;
+package br.com.alexsdm.conta.funcionalidades.abrirconta.service;
 
 
 import java.util.HashMap;

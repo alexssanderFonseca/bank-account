@@ -1,5 +1,6 @@
 package br.com.alexsdm.conta.compartilhado.database.item;
 
+import br.com.alexsdm.conta.dominio.Titular;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,6 +19,7 @@ public class TitularItem {
     private String contaId;
     private String nomeCompleto;
     private String dataNascimento;
+    private String email;
     private String cpf;
 
     @DynamoDbPartitionKey
@@ -40,5 +42,13 @@ public class TitularItem {
         this.id = "TITULAR#" + UUID.randomUUID();
     }
 
-
+    public Titular paraTitular(EnderecoItem enderecoItem) {
+        return Titular.builder()
+                .cpf(this.cpf)
+                .dataNascimento(this.dataNascimento)
+                .email(this.email)
+                .nomeCompleto(this.nomeCompleto)
+                .endereco(enderecoItem.paraEndereco())
+                .build();
+    }
 }
